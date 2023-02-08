@@ -9,11 +9,11 @@ import math
 class calc_capture_pos:
     def __init__(self):
         rospy.init_node('calc_capture_pos_node', anonymous=True)
-        self.path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/result/analysis/path/'
+        self.path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/'
 
     def calc_pos(self):
         offset_angle = 0
-        with open(self.path +  'capture_pos_path.csv', 'a') as fw:
+        with open(self.path + 'capture_pos/00_02.csv', 'a') as fw:
             writer = csv.writer(fw, lineterminator='\n')
             i = 0
             with open(self.path +  'path.csv', 'r') as fr:
@@ -26,15 +26,15 @@ class calc_capture_pos:
                         if i >= 2:
                             distance = math.sqrt((x - x0)**2+(y - y0)**2)
                             # if distance > 0.5:
-                            if distance > 0.25:
+                            if distance > 0.1:
                                 angle = math.atan2(y - y0, x - x0)
                                 direction = angle + math.pi / 180 * offset_angle
                                 direction = direction - 2.0 * math.pi if direction >  math.pi else direction
                                 direction = direction + 2.0 * math.pi if direction < -math.pi else direction
                                 # for dy in [-0.3,-0.2,-0.1,0.0,0.1,0.2,0.3]:
-                                for dy in [-0.2, -0.1, -0.05, 0.0, 0.05, 0.1, 0.2]:
+                                for dy in [-0.2, 0.0, 0.2]:
                                 # for dy in [-0.3, -0.2, -0.15, -0.1, -0.08, -0.06, -0.04, -0.02, -0.01, 0.0, 0.01, 0.02, 0.04, 0.06, 0.08, 0.1, 0.15, 0.2, 0.3]:
-                                    line = [str(x-dy*math.sin(angle)), str(y+dy*math.cos(angle)), str(direction)]
+                                    line = [str(i), str(x-dy*math.sin(angle)), str(y+dy*math.cos(angle)), str(direction)]
                                     writer.writerow(line)
                                 x0, y0 = x, y
                     i += 1

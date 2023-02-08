@@ -20,7 +20,7 @@ from yaml import load
 
 
 # HYPER PARAM
-BATCH_SIZE = 1151*3
+BATCH_SIZE = 1667*3
 # BATCH_SIZE = 8
 # BATCH_SIZE = 916*3
 # BATCH_SIZE = 2485*3
@@ -161,10 +161,7 @@ class deep_learning:
 
     def save(self, save_path):
         #<model save>
-        path = save_path + time.strftime("%Y%m%d_%H:%M:%S")
-        os.makedirs(path)
-        torch.save(self.net.state_dict(), path + '/model_gpu.pt')
-
+        torch.save(self.net.state_dict(), save_path)
 
     def load(self, load_path):
         #<model load>

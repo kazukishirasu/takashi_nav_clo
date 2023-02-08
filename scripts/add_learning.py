@@ -5,20 +5,25 @@ import csv
 from skimage.transform import resize
 import time
 import os
-import joblib
+import sys
 
 class cource_following_learning_node:
     def __init__(self):
         self.dl = deep_learning(n_action=1)
         self.start_time = time.strftime("%Y%m%d_%H:%M:%S")
-        os.makedirs("/home/y-takahashi/catkin_ws/src/nav_cloning/data/loss/" + self.start_time)
-        self.save_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/model/")
-        self.ang_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/ang/cit2-3/")
-        self.img_right_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/img/cit2-3/right")
-        self.img_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/img/cit2-3/center")
-        self.img_left_path = ("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/analysis/img/cit2-3/left")
+        # os.makedirs("/home/y-takahashi/catkin_ws/src/nav_cloning/data/loss/" + self.start_time)
+        self.model_num = str(sys.argv[1])
+        self.pro = "00_02"
+        self.save_path = ("/home/kazuki/takashi_ws/src/nav_cloning/data/model/"+str(self.pro)+"/model"+str(self.model_num)+".pt")
+        self.ang_path = ("/home/kazuki/takashi_ws/src/nav_cloning/data/ang/"+str(self.pro)+"/")
+        self.img_right_path = ("/home/kazuki/takashi_ws/src/nav_cloning/data/img/"+str(self.pro)+"/right")
+        self.img_path = ("/home/kazuki/takashi_ws/src/nav_cloning/data/img/"+str(self.pro)+"/center")
+        self.img_left_path = ("/home/kazuki/takashi_ws/src/nav_cloning/data/img/"+str(self.pro)+"/left")
         self.learn_no = 4000
         self.pos_no = 0
+        self.data = 1667
+        os.makedirs("/home/kazuki/takashi_ws/src/nav_cloning/data/model/"+str(self.pro), exist_ok=True)
+        os.makedirs("/home/kazuki/takashi_ws/src/nav_cloning/data/loss/"+str(self.pro)+"/", exist_ok=True)
         
         # self.dl.save("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/")
 
@@ -28,7 +33,7 @@ class cource_following_learning_node:
         img_list = []
         img_left_list = []
         #tsudanuma_2-3
-        for i in range(1151):
+        for i in range(self.data):
         #old
         # for i in range(886):
         #exp1
@@ -50,7 +55,7 @@ class cource_following_learning_node:
                 no, tar_ang = row
                 ang_list.append(float(tar_ang))
         #tsudanuma_2-3
-        for k in range(1151 * 3):
+        for k in range(self.data * 3):
         #old
         # for k in range(886 * 3):
         # for k in range(2832 * 4):
@@ -105,12 +110,12 @@ class cource_following_learning_node:
         for l in range(self.learn_no):
             loss = self.dl.trains()
             print("train" + str(l))
-            with open("/home/y-takahashi/catkin_ws/src/nav_cloning/data/loss/" + self.start_time + "/loss.csv", 'a') as fw:
+            with open("/home/kazuki/takashi_ws/src/nav_cloning/data/loss/"+str(self.pro)+"/"+str(self.model_num)+".csv", 'a') as fw:
                 writer = csv.writer(fw, lineterminator='\n')
                 line = [str(loss)]
                 writer.writerow(line)
-        
         self.dl.save(self.save_path)
+        sys.exit()
 
 if __name__ == '__main__':
     rg = cource_following_learning_node()

@@ -50,12 +50,13 @@ class cource_following_learning_node:
         self.cv_right_image = np.zeros((480,640,3), np.uint8)
         self.init = True
         self.start_time = time.strftime("%Y%m%d_%H:%M:%S")
-        self.path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/result/'
+        self.name = '00_02'
+        self.path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/'
         self.collect_data_srv = rospy.Service('/collect_data', Trigger, self.collect_data)
         self.goal_pub_srv = rospy.Service('/goal_pub', Trigger, self.goal_pub)
         self.save_img_no = 0
         self.clear_no = 0       
-        self.csv_path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/result/analysis/path/'
+        # self.csv_path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/'
         self.pos_list = []
         self.goal_list = []
         self.cur_pos = []
@@ -71,12 +72,12 @@ class cource_following_learning_node:
         self.state.model_name = 'mobile_base'
         self.amcl_pose_pub = rospy.Publisher('initialpose', PoseWithCovarianceStamped, queue_size=1)
         self.simple_goal_pub = rospy.Publisher('move_base_simple/goal', PoseStamped, queue_size=10)
-        os.makedirs(self.path + "analysis/img/" + self.start_time)
-        os.makedirs(self.path + "analysis/ang/" + self.start_time)
+        os.makedirs(self.path + "img/" + self.name, exist_ok=True)
+        os.makedirs(self.path + "ang/" + self.name, exist_ok=True)
         self.dl = deep_learning(n_action=1)
         
 
-        with open(self.csv_path + 'capture_pos_path.csv', 'r') as fs:
+        with open(self.path + 'capture_pos/'+str(self.name)+'.csv', 'r') as fs:
         # with open(self.csv_path + 'capture_pos_fix.csv', 'r') as fs:
             for row in fs:
                 self.pos_list.append(row)
@@ -84,9 +85,9 @@ class cource_following_learning_node:
     def capture_img(self):
             Flag = True
             try:
-                cv2.imwrite(self.path + "analysis/img/" + self.start_time + "/center" + str(self.save_img_no) + "_" + self.ang_no + ".jpg", self.im_resized)
-                cv2.imwrite(self.path + "analysis/img/" + self.start_time + "/right" + str(self.save_img_no) + "_" + self.ang_no + ".jpg", self.im_right_resized)
-                cv2.imwrite(self.path + "analysis/img/" + self.start_time + "/left" + str(self.save_img_no) + "_" + self.ang_no + ".jpg", self.im_left_resized)
+                cv2.imwrite(self.path + "/img/" + self.name + "/center" + str(self.save_img_no) + "_" + self.ang_no + ".jpg", self.im_resized)
+                cv2.imwrite(self.path + "/img/" + self.name + "/right" + str(self.save_img_no) + "_" + self.ang_no + ".jpg", self.im_right_resized)
+                cv2.imwrite(self.path + "/img/" + self.name + "/left" + str(self.save_img_no) + "_" + self.ang_no + ".jpg", self.im_left_resized)
             except:
                 print('Not save image')
                 Flag = False
@@ -96,7 +97,7 @@ class cource_following_learning_node:
 
     def capture_ang(self):
             line = [str(self.save_img_no), str(self.action)]
-            with open(self.path + "analysis/ang/" + self.start_time + '/ang.csv', 'a') as f:
+            with open(self.path + "ang/" + self.name + "/ang.csv" , 'a') as f:
                 writer = csv.writer(f, lineterminator='\n')
                 writer.writerow(line)
     
@@ -113,7 +114,7 @@ class cource_following_learning_node:
         #exp2.3
         # list_num = self.save_img_no + 57
         #exp1
-        list_num = self.save_img_no + 14
+        list_num = self.save_img_no + 24
         if list_num <= len(self.pos_list):
             self.cur_pos = self.pos_list[list_num]
             # self.cur_pos = self.pos_list[self.save_img_no + 14]
@@ -126,11 +127,11 @@ class cource_following_learning_node:
             self.g_pos.header.stamp = rospy.Time.now()
 
             self.g_pos.header.frame_id = 'map'
-            self.g_pos.pose.position.x = x 
-            self.g_pos.pose.position.y = y
+            # self.g_pos.pose.position.x = x 
+            # self.g_pos.pose.position.y = y
             #willow#
-            # self.g_pos.pose.position.x = x - 11.252
-            # self.g_pos.pose.position.y = y - 16.70
+            self.g_pos.pose.position.x = x - 11.252
+            self.g_pos.pose.position.y = y - 16.70
             self.g_pos.pose.position.z = 0
 
             self.g_pos.pose.orientation.x = 0 
@@ -151,11 +152,11 @@ class cource_following_learning_node:
 
             self.pos.header.frame_id = 'map'
             #tsudanuma2-3#
-            self.pos.pose.pose.position.x = x
-            self.pos.pose.pose.position.y = y
+            # self.pos.pose.pose.position.x = x
+            # self.pos.pose.pose.position.y = y
             #willow#
-            # self.pos.pose.pose.position.x = x - 11.252
-            # self.pos.pose.pose.position.y = y - 16.70
+            self.pos.pose.pose.position.x = x - 11.252
+            self.pos.pose.pose.position.y = y - 16.70
 
             quaternion_ = tf.transformations.quaternion_from_euler(0, 0, angle)
 
@@ -237,7 +238,7 @@ class cource_following_learning_node:
                     #exp2.3
                     # if offset_ang == 0 and self.save_img_no % 19 == 0:
                     #exp1
-                    if offset_ang == 0 and self.save_img_no % 7 == 0:
+                    if offset_ang == 0 and self.save_img_no % 3 == 0:
                         # os.system('rosservice call /move_base/clear_costmaps')
                         self.simple_goal()
                     # elif self.clear_no == 4 and offset_ang == 7:
@@ -248,8 +249,8 @@ class cource_following_learning_node:
                     if offset_ang == -5:
                         self.amcl_pose_pub.publish(self.pos)
                         # if self.save_img_no % 19 == 0:
-                        if self.save_img_no % 21 == 0:
-                            self.amcl_pose_pub.publish(self.pos)
+                        # if self.save_img_no % 21 == 0:
+                            # self.amcl_pose_pub.publish(self.pos)
 
                     #test
                     self.capture_img()
