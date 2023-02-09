@@ -215,54 +215,26 @@ class cource_following_learning_node:
                     # self.cv_left_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
                     self.im_left_resized = cv2.resize(self.cv_left_image, dsize=(64, 48))
                     
-                    # self.img = resize(self.cv_image, (48, 64), mode='constant')
-                    # r, g, b = cv2.split(img)
-                    # imgobj = np.asanyarray([r, g, b])
+                    # if offset_ang == 0 and self.save_img_no % 3 == 0:
+                    #     self.simple_goal()
+                    # if offset_ang == -5:
+                    #     self.amcl_pose_pub.publish(self.pos)
 
-                    # self.img_left = resize(self.cv_left_image, (48, 64), mode='constant')
-                    # r, g, b = cv2.split(img_left)
-                    # imgobj_left = np.asanyarray([r, g, b])
-
-                    # self.img_right = resize(self.cv_right_image, (48, 64), mode='constant')
-                    # r, g, b = cv2.split(img_right)
-                    # imgobj_right = np.asanyarray([r, g, b])
-                    
-                    # self.dl.make_dataset(imgobj, self.action)
-                    # self.dl.make_dataset(imgobj_left, self.action - 0.2)
-                    # self.dl.make_dataset(imgobj_right, self.action + 0.2)
-
-                    ## dist 0.5 dy 0.1 ##
-                    # if offset_ang == 0 and self.save_img_no % 7 == 0:
-                    ## dy 0.05 ##
-                    # if offset_ang == 0 and self.save_img_no % 13 == 0:
-                    #exp2.3
-                    # if offset_ang == 0 and self.save_img_no % 19 == 0:
-                    #exp1
                     if offset_ang == 0 and self.save_img_no % 3 == 0:
-                        # os.system('rosservice call /move_base/clear_costmaps')
                         self.simple_goal()
-                    # elif self.clear_no == 4 and offset_ang == 7:
-                    #     os.system('rosservice call /move_base/clear_costmaps')
-                    #     self.clear_no = -3
-                    
-                    # if offset_ang == -7:
+                    if self.save_img_no % 3 != 0:
+                        self.capture_img()
+                        self.capture_ang()
                     if offset_ang == -5:
                         self.amcl_pose_pub.publish(self.pos)
-                        # if self.save_img_no % 19 == 0:
-                        # if self.save_img_no % 21 == 0:
-                            # self.amcl_pose_pub.publish(self.pos)
-
                     #test
-                    self.capture_img()
-                    self.capture_ang()
+                    # self.capture_img()
+                    # self.capture_ang()
                 except rospy.ServiceException as e:
                     print("Service call failed: %s" % e)
                 self.r.sleep()
                 self.r.sleep()
                 self.r.sleep()
-                # self.r.sleep()
-                # self.r.sleep()
-                # self.r.sleep()
             
             self.r.sleep()
             self.r.sleep()
