@@ -50,12 +50,15 @@ class cource_following_learning_node:
         self.cv_right_image = np.zeros((480,640,3), np.uint8)
         self.init = True
         self.start_time = time.strftime("%Y%m%d_%H:%M:%S")
-        self.name = '00_02'
+        self.name = '02'
+        self.goal_offset = 24
+        self.goal_rate = 3
         self.path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/'
         self.collect_data_srv = rospy.Service('/collect_data', Trigger, self.collect_data)
         self.goal_pub_srv = rospy.Service('/goal_pub', Trigger, self.goal_pub)
         self.save_img_no = 0
         self.clear_no = 0       
+        self.offset_ang = 0
         # self.csv_path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/'
         self.pos_list = []
         self.goal_list = []
@@ -107,19 +110,12 @@ class cource_following_learning_node:
             x = float(pos[1])
             y = float(pos[2])
             theta = float(pos[3])
-            # print('Moving_pose:', x, y, theta)
             return x, y, theta
 
     def simple_goal(self):
-        #exp2.3
-        # list_num = self.save_img_no + 57
-        #exp1
-        list_num = self.save_img_no + 24
+        list_num = self.save_img_no + self.goal_offset
         if list_num <= len(self.pos_list):
             self.cur_pos = self.pos_list[list_num]
-            # self.cur_pos = self.pos_list[self.save_img_no + 14]
-            # self.cur_pos = self.pos_list[self.save_img_no + 21]
-            # self.cur_pos = self.pos_list[self.save_img_no + 52]
             simple_pos = self.cur_pos.split(',')
             x = float(simple_pos[1])
             y = float(simple_pos[2])
@@ -170,9 +166,9 @@ class cource_following_learning_node:
 
             # self.amcl_pose_pub.publish(self.pos)
             #gazebo
-            # for offset_ang in [-7, -5, -3, 0, 3, 5, 7]:
-            for offset_ang in [-5, 0, 5]:
-                the = angle + math.radians(offset_ang)
+            # for self.offset_ang in [-7, -5, -3, 0, 3, 5, 7]:
+            for self.offset_ang in [-5, 0, 5]:
+                the = angle + math.radians(self.offset_ang)
                 the = the - 2.0 * math.pi if the >  math.pi else the
                 the = the + 2.0 * math.pi if the < -math.pi else the
                 self.state.pose.position.x = x
@@ -183,25 +179,25 @@ class cource_following_learning_node:
                 self.state.pose.orientation.z = quaternion[2]
                 self.state.pose.orientation.w = quaternion[3]
 
-                # if offset_ang == -7:
+                # if self.offset_ang == -7:
                 #     self.ang_no = "-7"
                 
-                if offset_ang == -5:
+                if self.offset_ang == -5:
                     self.ang_no = "-5"
 
-                # if offset_ang == -3:
+                # if self.offset_ang == -3:
                 #     self.ang_no = "-3"
 
-                if offset_ang == 0:
+                if self.offset_ang == 0:
                     self.ang_no = "0"
 
-                # if offset_ang == +3:
+                # if self.offset_ang == +3:
                 #     self.ang_no = "+3"
 
-                if offset_ang == +5:
+                if self.offset_ang == +5:
                     self.ang_no = "+5"
 
-                # if offset_ang == +7:
+                # if self.offset_ang == +7:
                 #     self.ang_no = "+7"
 
                 try:
@@ -215,17 +211,17 @@ class cource_following_learning_node:
                     # self.cv_left_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
                     self.im_left_resized = cv2.resize(self.cv_left_image, dsize=(64, 48))
                     
-                    # if offset_ang == 0 and self.save_img_no % 3 == 0:
+                    # if self.offset_ang == 0 and self.save_img_no % 3 == 0:
                     #     self.simple_goal()
-                    # if offset_ang == -5:
+                    # if self.offset_ang == -5:
                     #     self.amcl_pose_pub.publish(self.pos)
 
-                    if offset_ang == 0 and self.save_img_no % 3 == 0:
+                    if self.offset_ang == 0 and self.save_img_no % self.goal_rate == 0:
                         self.simple_goal()
                     if self.save_img_no % 3 != 0:
                         self.capture_img()
                         self.capture_ang()
-                    if offset_ang == -5:
+                    if self.offset_ang == -5:
                         self.amcl_pose_pub.publish(self.pos)
                     #test
                     # self.capture_img()
@@ -254,9 +250,8 @@ class cource_following_learning_node:
         for i in range(len(self.pos_list)):
             x, y, theta = self.read_csv()
             self.robot_moving(x, y, theta)
-            # print("current_position:", x, y, theta)
-
             self.save_img_no += 1
+            # print("current_position:", x, y, theta)
             # self.clear_no += 1
             # print("clear_no", self.clear_no)
             self.capture_rate.sleep()

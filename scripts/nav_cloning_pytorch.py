@@ -20,7 +20,7 @@ from yaml import load
 
 
 # HYPER PARAM
-BATCH_SIZE = 1667*3
+BATCH_SIZE = 1112*3
 # BATCH_SIZE = 8
 # BATCH_SIZE = 916*3
 # BATCH_SIZE = 2485*3

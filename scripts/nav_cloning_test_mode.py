@@ -322,7 +322,8 @@ class nav_cloning_node:
         else:
             target_action = self.dl.act(img)
             distance = self.min_distance
-            print(str(self.episode) + ", test, angular:" + str(target_action) + ", distance: " + str(distance))
+            # print(str(self.episode) + ", test, angular:" + str(target_action) + ", distance: " + str(distance))
+            print(str(self.episode) + ", test, angular:" + str(target_action))
 
             self.episode += 1
             angle_error = abs(self.action - target_action)
