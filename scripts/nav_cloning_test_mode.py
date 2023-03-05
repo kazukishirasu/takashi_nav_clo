@@ -63,9 +63,10 @@ class nav_cloning_node:
         self.learning = False
         self.select_dl = False
         self.start_time = time.strftime("%Y%m%d_%H:%M:%S")
+        self.learn_no = 4000
         self.pro = "00_02"
-        self.load_path = "/home/kazuki/takashi_ws/src/nav_cloning/data/model/"+str(self.pro)+"/model"+str(self.num)+".pt"
-        self.score = "/home/kazuki/takashi_ws/src/nav_cloning/data/score/"+str(self.pro)+".csv"
+        self.load_path = "/home/kazuki/takashi_ws/src/nav_cloning/data/model/"+str(self.pro)+"/"+str(self.learn_no)+"/model"+str(self.num)+".pt"
+        self.score = "/home/kazuki/takashi_ws/src/nav_cloning/data/score/"+str(self.pro)+"/"+str(self.learn_no)
         if self.learning == False:
             print(self.load_path)
             self.dl.load(self.load_path)
@@ -79,6 +80,7 @@ class nav_cloning_node:
         self.collision_list = [[],[]]
         self.is_started = False
         self.start_time_s = rospy.get_time()
+        os.makedirs(self.score, exist_ok=True)
         # os.makedirs(self.path, exist_ok=True)
         # os.makedirs(self.save_path, exist_ok=True)
         # os.makedirs(self.path + self.start_time)
@@ -214,9 +216,9 @@ class nav_cloning_node:
             #         sys.exit()
         self.old_wp = self.current_wp
 
-        if self.lap == 4:
+        if self.lap == 2:
             line = ['model_'+str(self.num), 'True', str(self.lap)]
-            with open(self.score, 'a') as f:
+            with open(self.score+"/score.csv", 'a') as f:
                 writer = csv.writer(f, lineterminator='\n')
                 writer.writerow(line)
             os.system('killall roslaunch')
@@ -226,7 +228,7 @@ class nav_cloning_node:
             collision_flag = self.collision()
             if collision_flag:
                 line = ['model_'+str(self.num), 'False', str(self.lap), str(self.pos_x), str(self.pos_y)]
-                with open(self.score, 'a') as f:
+                with open(self.score+"/score.csv", 'a') as f:
                     writer = csv.writer(f, lineterminator='\n')
                     writer.writerow(line)
                 os.system('killall roslaunch')

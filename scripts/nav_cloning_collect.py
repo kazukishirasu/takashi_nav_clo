@@ -50,9 +50,9 @@ class cource_following_learning_node:
         self.cv_right_image = np.zeros((480,640,3), np.uint8)
         self.init = True
         self.start_time = time.strftime("%Y%m%d_%H:%M:%S")
-        self.name = '02'
-        self.goal_offset = 24
-        self.goal_rate = 3
+        self.name = '00_01_02'
+        self.goal_offset = 50 #24
+        self.goal_rate = 5 #3
         self.path = roslib.packages.get_pkg_dir('nav_cloning') + '/data/'
         self.collect_data_srv = rospy.Service('/collect_data', Trigger, self.collect_data)
         self.goal_pub_srv = rospy.Service('/goal_pub', Trigger, self.goal_pub)
@@ -218,14 +218,15 @@ class cource_following_learning_node:
 
                     if self.offset_ang == 0 and self.save_img_no % self.goal_rate == 0:
                         self.simple_goal()
-                    if self.save_img_no % 3 != 0:
-                        self.capture_img()
-                        self.capture_ang()
+                        self.amcl_pose_pub.publish(self.pos)
+                    # if self.save_img_no % 3 != 0:
+                    #     self.capture_img()
+                    #     self.capture_ang()
                     if self.offset_ang == -5:
                         self.amcl_pose_pub.publish(self.pos)
                     #test
-                    # self.capture_img()
-                    # self.capture_ang()
+                    self.capture_img()
+                    self.capture_ang()
                 except rospy.ServiceException as e:
                     print("Service call failed: %s" % e)
                 self.r.sleep()
@@ -251,21 +252,8 @@ class cource_following_learning_node:
             x, y, theta = self.read_csv()
             self.robot_moving(x, y, theta)
             self.save_img_no += 1
-            # print("current_position:", x, y, theta)
-            # self.clear_no += 1
-            # print("clear_no", self.clear_no)
             self.capture_rate.sleep()
-
-            ##dist 0.1 dy 0.1 ##
-            # if i == len(self.pos_list) - 11:
-            ## dist 0.25 ##
-            # if i == len(self.pos_list) - 18:
-            ##dist 0.25 dy 0.05 ##
-            # if i == len(self.pos_list) - 59:
             if i == len(self.pos_list):
-                # for j in range(4000):
-                #     self.dl.trains()
-                # self.dl.save("/home/y-takahashi/catkin_ws/src/nav_cloning/data/result/")
                 os.system('killall roslaunch')
                 sys.exit()
 

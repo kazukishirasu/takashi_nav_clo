@@ -20,10 +20,7 @@ from yaml import load
 
 
 # HYPER PARAM
-BATCH_SIZE = 1112*3
-# BATCH_SIZE = 8
-# BATCH_SIZE = 916*3
-# BATCH_SIZE = 2485*3
+# BATCH_SIZE = 1666*3
 MAX_DATA = 10000
 
 class Net(nn.Module):
@@ -109,9 +106,30 @@ class deep_learning:
         
     #<make dataset>
         self.dataset = TensorDataset(self.x_cat,self.t_cat)
-        # print(type(self.dataset))
 
-    def trains(self):
+    # def trains(self):
+    #     self.net.train()
+    #     train_dataset = DataLoader(self.dataset, batch_size=BATCH_SIZE, generator=torch.Generator('cpu'),shuffle=True)
+        
+    # #<only cpu>
+    #     # train_dataset = DataLoader(dataset, batch_size=BATCH_SIZE,shuffle=True)
+        
+    # #<split dataset and to device>
+    #     for x_train, t_train in train_dataset:
+    #         x_train.to(self.device,non_blocking=True)
+    #         t_train.to(self.device,non_blocking=True)
+    #         break
+
+    # #<learning>
+    #     self.optimizer.zero_grad()
+    #     y_train = self.net(x_train)
+    #     loss = self.criterion(y_train, t_train) 
+    #     loss.backward()
+    #     self.optimizer.step()
+    #     return loss.item()
+    
+    def trains(self, BATCH_SIZE):
+        # print("batch_size", BATCH_SIZE)
         self.net.train()
         train_dataset = DataLoader(self.dataset, batch_size=BATCH_SIZE, generator=torch.Generator('cpu'),shuffle=True)
         
